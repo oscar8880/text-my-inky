@@ -49,3 +49,7 @@ def incoming_sms():
     resp.message('You said: ' + body)
 
     return str(resp)
+
+@app.route("/")
+def info():
+    return 'Twilio Flask API'
