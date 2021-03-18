@@ -1,5 +1,9 @@
 import os
+import requests
+import urllib
 from flask import Flask, request, redirect, abort, current_app
+from PIL import Image, ImageOps
+from io import BytesIO
 from functools import wraps
 from twilio.request_validator import RequestValidator
 from twilio.twiml.messaging_response import MessagingResponse
@@ -9,9 +13,9 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# account_sid = os.environ['TWILIO_ACCOUNT_SID']
 auth_token = os.environ['TWILIO_AUTH_TOKEN']
-# client = Client(account_sid, auth_token)
+pixabay_api_key = os.environ['PIXABAY_API_KEY']
+display_environment = os.environ['DISPLAY_ENV']
 
 def validate_twilio_request(f):
     """Validates that incoming requests genuinely originated from Twilio"""
@@ -26,6 +30,7 @@ def validate_twilio_request(f):
             request.url,
             request.form,
             request.headers.get('X-TWILIO-SIGNATURE', ''))
+        print(request_valid)
 
         # Continue processing the request if it's valid (or if DEBUG is True)
         # and return a 403 error if it's not
@@ -47,6 +52,33 @@ def incoming_sms():
 
     # Determine the right reply for this message
     resp.message('You said: ' + body)
+
+    return str(resp)
+
+@app.route("/image", methods=['GET', 'POST'])
+@validate_twilio_request
+def fetch_image():
+    # Get the message the user sent our Twilio number
+    body = request.values.get('Body', None)
+    encoded_query = urllib.parse.quote_plus(body)
+    request_url = "https://pixabay.com/api/?key={}&q={}&min_width=600&min_height=448&orientation=horizontal&safesearch=true".format(pixabay_api_key, encoded_query)
+    response = requests.get(request_url).json()
+    first_image_url = response['hits'][0]['webformatURL']
+    first_image_tags = response['hits'][0]['tags']
+    first_image = requests.get(first_image_url)
+    img = Image.open(BytesIO(first_image.content))
+    resized_image = ImageOps.fit(img,(600,448))
+    
+    # Start our TwiML response
+    resp = MessagingResponse()
+
+    if display_environment == 'TEST':
+        # Show image 
+        resized_image.show()
+        resp.message('Found an image with these tags:{}. But not displaying on Inky.'.format(first_image_tags))
+    else:
+        # Do pimoroni inky stuff
+        resp.message('Displaying image on Inky with these tags:{}.'.format(first_image_tags))
 
     return str(resp)
 
