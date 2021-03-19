@@ -37,9 +37,9 @@ def image():
         encoded_query = urllib.parse.quote_plus(body)
         request_url = "https://pixabay.com/api/?key={}&q={}&min_width=600&min_height=448&orientation=horizontal&safesearch=true".format(pixabay_api_key, encoded_query)
         response = requests.get(request_url).json()
-        image_results = response.hits
+        image_results = response['hits']
         if len(image_results) < 1:
-            raise: NoImagesError
+            raise NoImagesError
         first_image_url = response['hits'][0]['webformatURL']
         first_image_tags = response['hits'][0]['tags']
         first_image = requests.get(first_image_url)
