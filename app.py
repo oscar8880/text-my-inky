@@ -7,6 +7,7 @@ from io import BytesIO
 from twilio.twiml.messaging_response import MessagingResponse
 from dotenv import load_dotenv
 from auth import validate_twilio_request
+from display import show_image
 
 load_dotenv()
 
@@ -39,13 +40,13 @@ def image():
     # Start our TwiML response
     resp = MessagingResponse()
 
-    if display_environment == 'NONE':
-        resp.message('Found an image with these tags:{}. Not displaying anywhere.'.format(first_image_tags))
-    elif display_environment == 'DISPLAY':
+    if display_environment == 'DISPLAY':
         resp.message('Found an image with these tags:{}. Displaying on test machine.'.format(first_image_tags))
-        resized_image.show()
-    else:
-        # Do pimoroni inky stuff
+    elif display_environment == "INKY":
+        show_image(resized_image)
         resp.message('Displaying image on Inky with these tags:{}.'.format(first_image_tags))
+    else:
+        resp.message('Found an image with these tags:{}. Not displaying anywhere.'.format(first_image_tags))
+        resized_image.show()
 
     return str(resp)
