@@ -7,5 +7,8 @@ inky = Inky()
 saturation = 0.5
 
 def show_image(image):
-    inky.set_image(image, saturation=saturation)
+    # convert image to allow for PNGs
+    converted_image = image.convert('RGB')
+    converted_image.show()
+    inky.set_image(converted_image, saturation=saturation)
     inky.show()

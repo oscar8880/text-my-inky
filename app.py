@@ -51,12 +51,12 @@ def image():
 
 
     if display_environment == 'DISPLAY':
-        resp.message('Found an image with these tags:{}. Displaying on test machine.'.format(first_image_tags))
+        resp.message('Found an image with these tags: {}. Displaying on test machine.'.format(first_image_tags))
     elif display_environment == "INKY":
         show_image(resized_image)
-        resp.message('Displaying image on Inky with these tags:{}.'.format(first_image_tags))
+        resp.message('Displaying image on Inky with these tags: {}.'.format(first_image_tags))
     else:
-        resp.message('Found an image with these tags:{}. Not displaying anywhere.'.format(first_image_tags))
+        resp.message('Found an image with these tags: {}. Not displaying anywhere.'.format(first_image_tags))
         resized_image.show()
 
     return str(resp)
