@@ -16,7 +16,6 @@ def validate_twilio_request(auth_token):
                 request.url,
                 request.form,
                 request.headers.get('X-TWILIO-SIGNATURE', ''))
-            print(request_valid)
 
             # Continue processing the request if it's valid (or if DEBUG is True)
             # and return a 403 error if it's not

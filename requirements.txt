@@ -18,6 +18,7 @@ PyJWT==1.7.1
 pylint==2.7.2
 python-dotenv==0.15.0
 pytz==2021.1
+ratelimit==2.2.1
 requests==2.25.1
 six==1.15.0
 smbus2==0.4.1
